@@ -26,6 +26,7 @@ public class UI {
     private JTextField ipText;
     private JTextField portText;
     private ServerMessage serverMessage;
+    private UI ui;
 
     public UI(ServerMessage serverMessage) {
         this.serverMessage = serverMessage;
@@ -42,7 +43,7 @@ public class UI {
         JLabel portLabel = new JLabel("Port");
         portText = new JTextField(3);
         JButton connectButton = new JButton("Connect");
-//		connectButton.addActionListener(connectionAction);
+        connectButton.addActionListener(new ConnectionAction());
 
         authorizePanel.add(nameLabel);
         authorizePanel.add(nameField);
@@ -74,8 +75,20 @@ public class UI {
 
         ipText.setText(SERVER_IP_ADDRESS);
         portText.setText(Integer.toString(PORT));
+        ui = this;
+    }
 
-        authorizePanelIsShow(true);//TODO remove when impl connection
+    public class ConnectionAction implements ActionListener {
+
+        @Override
+        public void actionPerformed(ActionEvent e) {
+            try {
+                serverMessage.connect(getName(), new ClientBroadcasterImpl(ui));
+                authorizePanelIsShow(true);
+            } catch (RemoteException e1) {
+                e1.printStackTrace();
+            }
+        }
     }
 
     public class SendAction implements ActionListener {
@@ -83,7 +96,7 @@ public class UI {
         @Override
         public void actionPerformed(ActionEvent e) {
             try {
-                serverMessage.send(getMessage());
+                serverMessage.send(getName(), getMessage());
             } catch (RemoteException e1) {
                 e1.printStackTrace();
             }
@@ -94,8 +107,12 @@ public class UI {
         return nameField.getText().trim();
     }
 
-    public void printOnChatArea(String s) {
-        chatArea.append(s + "\n");
+    public void printOnChatArea(String message) {
+        chatArea.append(message + "\n");
+    }
+
+    public void printOnChatArea(String name, String message) {
+        chatArea.append(name + ": " + message + "\n");
     }
 
     public String getMessage() {
