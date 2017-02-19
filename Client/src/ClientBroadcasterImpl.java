@@ -6,6 +6,7 @@ import java.rmi.server.UnicastRemoteObject;
  */
 public class ClientBroadcasterImpl extends UnicastRemoteObject implements ClientBroadcaster {
     private UI ui;
+    private String name;
 //    private static int portCounter = 8889;
 
     protected ClientBroadcasterImpl(UI ui) throws RemoteException {
@@ -15,6 +16,16 @@ public class ClientBroadcasterImpl extends UnicastRemoteObject implements Client
 
     @Override
     public void getMessagesFromOtherClients(String name, String message) throws RemoteException {
-        ui.printOnChatArea(message.trim());
+        ui.printOnChatArea(name+": "+message.trim());
+        this.name = name;
+    }
+
+    @Override
+    public String getName() throws RemoteException {
+        return name;
+    }
+
+    public void setName(String name) throws RemoteException{
+        this.name = name;
     }
 }
